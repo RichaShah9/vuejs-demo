@@ -1,6 +1,6 @@
 <template>
   <div>
-    Header
+    Todo App
   </div>
 </template>
 
