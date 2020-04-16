@@ -1,7 +1,17 @@
 <template>
   <div class="root">
-    <input v-model="search" placeholder="Search" /><br />
-    <input v-model="todo" placeholder="Add todo" /><br />
+    <input v-model="search" placeholder="Search" class="search" /><br />
+    <div class="input-group">
+      <input
+        type="text"
+        placeholder="Add todo"
+        :maxlength="max"
+        v-model="todo"
+        onkeypress="return (event.charCode > 64 && event.charCode < 91) 
+        || (event.charCode > 96 && event.charCode < 123)"
+      />
+      <div class="input-length" v-text="max - todo.length"></div>
+    </div>
     <button v-on:click="addTodo">Add Todo</button>
 
     <div class="lists">
@@ -52,6 +62,7 @@ export default {
       nextTodoId: 0,
       search: "",
       isSorted: false,
+      max: 255,
     };
   },
   computed: {
@@ -135,5 +146,26 @@ export default {
   background: #f9f9fc;
   padding: 10px;
   margin-top: 10px;
+}
+
+.input-group {
+  display: flex;
+  margin: 10px 0px;
+}
+
+.input-length {
+  padding: 5px 15px;
+  font-size: 15px;
+  font-weight: normal;
+  line-height: 1;
+  color: #2c3e50;
+  text-align: center;
+  background-color: #ecf0f1;
+  border: 1px solid #dce4ec;
+  border-radius: 4px;
+}
+
+input {
+  padding: 5px 15px;
 }
 </style>
