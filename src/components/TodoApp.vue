@@ -54,7 +54,7 @@
 
 <script>
 export default {
-  name: "Content",
+  name: "TodoApp",
   data() {
     return {
       todo: "",
