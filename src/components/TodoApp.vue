@@ -5,25 +5,24 @@
       <input
         type="text"
         placeholder="Add todo"
-        :maxlength="max"
+        :maxlength="255"
         v-model="todo"
         onkeypress="return (event.charCode > 64 && event.charCode < 91) 
         || (event.charCode > 96 && event.charCode < 123)"
       />
-      <div class="input-length" v-text="max - todo.length"></div>
+      <div class="input-length" v-text="255 - todo.length"></div>
     </div>
-    <button v-on:click="addTodo">Add Todo</button>
-
+    <button v-on:click="add_todo" :disabled="todo == ''">Add Todo</button>
     <div class="lists">
       <div>
-        <h4 v-on:click="toggleSort">
+        <h4 v-on:click="toggle_sort">
           Todo List
           <span class="arrow " :class="isSorted ? 'dsc' : 'asc'" />
         </h4>
-        <div v-for="msg in filteredList" v-bind:key="msg.id">
-          <input type="checkbox" id="checkbox" v-model="msg.isActive" />
+        <div v-for="msg in filtered_list" v-bind:key="msg.id">
+          <input type="checkbox" :id="msg.id" v-model="msg.isActive" />
           <label
-            for="checkbox"
+            :for="msg.id"
             class="title"
             v-bind:class="{ active: msg.isActive }"
             >{{ msg.title }}</label
@@ -34,7 +33,7 @@
       <div>
         <h4>Pending</h4>
         <div>
-          <div v-for="msg in pendingList" v-bind:key="msg.id">
+          <div v-for="msg in pending_todos" v-bind:key="msg.id">
             {{ msg.title }}
           </div>
         </div>
@@ -43,7 +42,7 @@
       <div>
         <h4>Completed</h4>
         <div>
-          <div v-for="msg in completedList" v-bind:key="msg.id">
+          <div v-for="msg in completed_todos" v-bind:key="msg.id">
             {{ msg.title }}
           </div>
         </div>
@@ -58,47 +57,35 @@ export default {
   data() {
     return {
       todo: "",
-      todos: [],
-      nextTodoId: 0,
-      search: "",
-      isSorted: false,
-      max: 255,
+      isSorted: this.$store.state.isSorted,
     };
   },
-  computed: {
-    filteredList() {
-      if (this.isSorted) {
-        let filteredTodos = this.todos.filter((todo) => {
-          return todo.title.toLowerCase().includes(this.search.toLowerCase());
-        });
-        return (
-          filteredTodos &&
-          filteredTodos.slice(0).sort((a, b) => (a.title < b.title ? -1 : 1))
-        );
-      } else {
-        return this.todos.filter((todo) => {
-          return todo.title.toLowerCase().includes(this.search.toLowerCase());
-        });
-      }
-    },
-    completedList() {
-      return this.todos.filter((todo) => todo.isActive === true);
-    },
-    pendingList() {
-      return this.todos.filter((todo) => todo.isActive === false);
-    },
-  },
   methods: {
-    addTodo: function() {
-      this.todos.push({
-        title: this.todo,
-        id: this.nextTodoId++,
-        isActive: false,
-      });
+    add_todo: function() {
+      this.$store.dispatch("ADD_TODO", this.todo);
       this.todo = "";
     },
-    toggleSort: function() {
-      this.isSorted = !this.isSorted;
+    toggle_sort: function() {
+      this.$store.dispatch("TOGGLE_SORT");
+    },
+  },
+  computed: {
+    pending_todos: function() {
+      return this.$store.getters.pending_todos;
+    },
+    completed_todos: function() {
+      return this.$store.getters.completed_todos;
+    },
+    filtered_list: function() {
+      return this.$store.getters.filtered_list;
+    },
+    search: {
+      set(val) {
+        this.$store.commit("SET_SEARCH_KEYWORD", val);
+      },
+      get() {
+        return this.$store.state.search;
+      },
     },
   },
 };
